@@ -42,7 +42,7 @@ build().then(() => {
     writeFileSync(tmpdir+"/dist/package.json",
         JSON.stringify(new PackageJSONConfig().getConfig(moduleId)
             ,null,1));
-    shell.exec("tar -zRcvf "+moduleId+".tar.gz "+tmpdir+"/dist/");
+    shell.exec("tar -C "+tmpdir+"/dist -zRcvf "+moduleId+".tar.gz .");
     shell.exec("rm -Rf "+tmpdir);
     console.log("All done");
 });
