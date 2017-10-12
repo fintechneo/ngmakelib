@@ -13,6 +13,7 @@
     "typescript": ""
   },
   "dependencies": {
+    "cpx": "",
     "rollup": "^0.50.0",
     "shelljs": "^0.7.8",
     "@angular/compiler-cli": ""    

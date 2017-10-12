@@ -35,8 +35,8 @@ async function build() {
     await bundle.write(outputOptions);
 };
 build().then(() => {
+    shell.exec("./node_modules/.bin/cpx "+tmpdir+"/build/**/*.d.ts "+tmpdir+"/dist");
+    //shell.exec("rm -Rf "+tmpdir);
     console.log("All done");
 });
 
-//shell.exec("ls -Rl "+tmpdir);
-//shell.exec("rm -Rf "+tmpdir);
