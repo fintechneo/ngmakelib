@@ -51,9 +51,52 @@ function loadResourceFile(filePath) {
         .replace(/"/g, '\\"');
 }
 
+var AngularCompilerConfig = /** @class */ (function () {
+    function AngularCompilerConfig() {
+        this.config = {
+            "compilerOptions": {
+                "target": "es5",
+                "module": "es2015",
+                "moduleResolution": "node",
+                "sourceMap": true,
+                "emitDecoratorMetadata": false,
+                "experimentalDecorators": true,
+                "declaration": true,
+                "lib": ["es2015", "dom"],
+                "noImplicitAny": true,
+                "suppressImplicitAnyIndexErrors": true
+            },
+            "files": [],
+            "angularCompilerOptions": {
+                "genDir": "build",
+                "flatModuleOutFile": null,
+                "flatModuleId": null,
+                "skipTemplateCodegen": true,
+                "annotateForClosureCompiler": true,
+                "strictMetadataEmit": true
+            }
+        };
+    }
+    AngularCompilerConfig.prototype.getConfig = function (tsfile, outDir, moduleId) {
+        this.config.files[0] = tsfile;
+        this.config.compilerOptions.outDir = outDir;
+        this.config.angularCompilerOptions.flatModuleOutFile = moduleId + ".js";
+        this.config.angularCompilerOptions.flatModuleId = moduleId;
+        return this.config;
+    };
+    return AngularCompilerConfig;
+}());
+
 var libsrc = process.argv[2];
-var libdir = libsrc.substring(0, libsrc.lastIndexOf("/"));
-console.log("Hello from tsmakelib");
-var tmpdir = "/tmp/makelib" + new Date().getTime();
-shell.exec("cp -r " + libdir + " " + tmpdir);
+var moduleId = process.argv[3];
+var liborigsrcdir = libsrc.substring(0, libsrc.lastIndexOf("/"));
+var srcfile = libsrc.substring(libsrc.lastIndexOf("/") + 1);
+var tmpdir = ".ngmakelibtmp";
+fs.mkdirSync(tmpdir);
+shell.exec("cp -r " + liborigsrcdir + " " + tmpdir + "/src");
 inlineResourcesForDirectory(tmpdir);
+var config = new AngularCompilerConfig().getConfig("src/" + srcfile, "build", moduleId);
+fs.writeFileSync(tmpdir + '/tsconfig.json', JSON.stringify(config));
+shell.exec("node_modules/.bin/ngc -p " + tmpdir + '/tsconfig.json');
+shell.exec("ls -l " + tmpdir);
+shell.exec("rm -Rf " + tmpdir);

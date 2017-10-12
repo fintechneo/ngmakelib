@@ -14,6 +14,7 @@
     "typescript": ""
   },
   "dependencies": {
-    "shelljs": "^0.7.8"
+    "shelljs": "^0.7.8",
+    "@angular/compiler-cli": ""    
   }
 }
