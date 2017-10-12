@@ -87,6 +87,17 @@ class AngularCompilerConfig {
     }
 }
 
+class PackageJSONConfig {
+    getConfig(moduleId) {
+        return {
+            "name": moduleId,
+            "version": "0.1.0",
+            "main": moduleId + ".js",
+            "types": moduleId + ".d.ts"
+        };
+    }
+}
+
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -122,6 +133,8 @@ function build() {
 
 build().then(() => {
     shell.exec("./node_modules/.bin/cpx " + tmpdir + "/build/**/*.d.ts " + tmpdir + "/dist");
+    shell.exec("cp " + tmpdir + "/build/*.metadata.json " + tmpdir + "/dist/");
+    fs.writeFileSync(tmpdir + "/dist/package.json", JSON.stringify(new PackageJSONConfig().getConfig(moduleId), null, 1));
     //shell.exec("rm -Rf "+tmpdir);
     console.log("All done");
 });

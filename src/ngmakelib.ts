@@ -1,5 +1,7 @@
 import {inlineResourcesForDirectory} from './pkg-tools/inline-resources';
 import {AngularCompilerConfig} from './configs/angularcompiler.config';
+import { PackageJSONConfig } from './configs/packagejson.config';
+
 import {writeFileSync,mkdirSync} from 'fs';
 import * as shell from 'shelljs';
 import * as rollup from 'rollup';
@@ -36,7 +38,11 @@ async function build() {
 };
 build().then(() => {
     shell.exec("./node_modules/.bin/cpx "+tmpdir+"/build/**/*.d.ts "+tmpdir+"/dist");
-    //shell.exec("rm -Rf "+tmpdir);
+    shell.exec("cp "+tmpdir+"/build/*.metadata.json "+tmpdir+"/dist/");
+    writeFileSync(tmpdir+"/dist/package.json",
+        JSON.stringify(new PackageJSONConfig().getConfig(moduleId)
+            ,null,1));
+    shell.exec("rm -Rf "+tmpdir);
     console.log("All done");
 });
 
