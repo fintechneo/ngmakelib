@@ -4,7 +4,7 @@ export default {
     input: 'build/ngmakelib.js',
     output: {
       file: 'bin/ngmakelib.js', // output a single application bundle
-      format: 'iife'
+      format: 'cjs'
     },    
     sourceMap: false,
     plugins: [
