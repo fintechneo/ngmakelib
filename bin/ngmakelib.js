@@ -135,6 +135,7 @@ build().then(() => {
     shell.exec("./node_modules/.bin/cpx " + tmpdir + "/build/**/*.d.ts " + tmpdir + "/dist");
     shell.exec("cp " + tmpdir + "/build/*.metadata.json " + tmpdir + "/dist/");
     fs.writeFileSync(tmpdir + "/dist/package.json", JSON.stringify(new PackageJSONConfig().getConfig(moduleId), null, 1));
-    //shell.exec("rm -Rf "+tmpdir);
+    shell.exec("tar -zRcvf " + moduleId + ".tar.gz " + tmpdir + "/dist/");
+    shell.exec("rm -Rf " + tmpdir);
     console.log("All done");
 });
