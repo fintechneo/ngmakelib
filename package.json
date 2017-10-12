@@ -1,0 +1,19 @@
+{
+  "name": "ngmakelib",
+  "version": "0.0.1",
+  "scripts": {
+    "build": "tsc && rollup -c rollup-conf-build.js && chmod a+x bin/ngmakelib.js"
+  },
+  "bin": {
+    "ngmakelib": "bin/ngmakelib.js"
+  },
+  "devDependencies": {
+    "@types/node": "^8.0.34",
+    "rollup": "^0.50.0",
+    "rollup-plugin-shebang": "^0.1.4",
+    "typescript": ""
+  },
+  "dependencies": {
+    "shelljs": "^0.7.8"
+  }
+}

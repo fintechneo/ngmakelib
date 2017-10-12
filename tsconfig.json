@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "outDir": "build",
+        "moduleResolution": "node",
+        "module": "commonjs",
+        "typeRoots": [
+            "node_modules/@types"
+        ]
+    },
+    "files": [
+        "src/ngmakelib.ts"
+    ]
+}
