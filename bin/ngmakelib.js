@@ -5,15 +5,16 @@ var path = require('path');
 var fs = require('fs');
 var glob = require('glob');
 var shell = require('shelljs');
+var rollup = require('rollup');
 
 /** Finds all JavaScript files in a directory and inlines all resources of Angular components. */
 function inlineResourcesForDirectory(folderPath) {
-    glob.sync(path.join(folderPath, '**/*.ts')).forEach(function (filePath) { return inlineResources(filePath); });
+    glob.sync(path.join(folderPath, '**/*.ts')).forEach(filePath => inlineResources(filePath));
 }
 /** Inlines the external resources of Angular components of a file. */
 function inlineResources(filePath) {
     console.log("Inlining resources", filePath);
-    var fileContent = fs.readFileSync(filePath, 'utf-8');
+    let fileContent = fs.readFileSync(filePath, 'utf-8');
     fileContent = inlineTemplate(fileContent, filePath);
     fileContent = inlineStyles(fileContent, filePath);
     fileContent = removeModuleId(fileContent);
@@ -21,22 +22,22 @@ function inlineResources(filePath) {
 }
 /** Inlines the templates of Angular components for a specified source file. */
 function inlineTemplate(fileContent, filePath) {
-    return fileContent.replace(/templateUrl:\s*["']([^']+?\.html)["']/g, function (_match, templateUrl) {
-        var templatePath = path.join(path.dirname(filePath), templateUrl);
-        var templateContent = loadResourceFile(templatePath);
-        return "template: \"" + templateContent + "\"";
+    return fileContent.replace(/templateUrl:\s*["']([^']+?\.html)["']/g, (_match, templateUrl) => {
+        const templatePath = path.join(path.dirname(filePath), templateUrl);
+        const templateContent = loadResourceFile(templatePath);
+        return `template: "${templateContent}"`;
     });
 }
 /** Inlines the external styles of Angular components for a specified source file. */
 function inlineStyles(fileContent, filePath) {
-    return fileContent.replace(/styleUrls:\s*(\[[\s\S]*?])/gm, function (_match, styleUrlsValue) {
+    return fileContent.replace(/styleUrls:\s*(\[[\s\S]*?])/gm, (_match, styleUrlsValue) => {
         // The RegExp matches the array of external style files. This is a string right now and
         // can to be parsed using the `eval` method. The value looks like "['AAA.css', 'BBB.css']"
-        var styleUrls = eval(styleUrlsValue);
-        var styleContents = styleUrls
-            .map(function (url) { return path.join(path.dirname(filePath), url); })
-            .map(function (path$$1) { return loadResourceFile(path$$1); });
-        return "styles: [\"" + styleContents.join(' ') + "\"]";
+        const styleUrls = eval(styleUrlsValue);
+        const styleContents = styleUrls
+            .map(url => path.join(path.dirname(filePath), url))
+            .map(path$$1 => loadResourceFile(path$$1));
+        return `styles: ["${styleContents.join(' ')}"]`;
     });
 }
 /** Remove every mention of `moduleId: module.id` */
@@ -51,8 +52,8 @@ function loadResourceFile(filePath) {
         .replace(/"/g, '\\"');
 }
 
-var AngularCompilerConfig = /** @class */ (function () {
-    function AngularCompilerConfig() {
+class AngularCompilerConfig {
+    constructor() {
         this.config = {
             "compilerOptions": {
                 "target": "es5",
@@ -77,26 +78,50 @@ var AngularCompilerConfig = /** @class */ (function () {
             }
         };
     }
-    AngularCompilerConfig.prototype.getConfig = function (tsfile, outDir, moduleId) {
+    getConfig(tsfile, outDir, moduleId) {
         this.config.files[0] = tsfile;
         this.config.compilerOptions.outDir = outDir;
         this.config.angularCompilerOptions.flatModuleOutFile = moduleId + ".js";
         this.config.angularCompilerOptions.flatModuleId = moduleId;
         return this.config;
-    };
-    return AngularCompilerConfig;
-}());
+    }
+}
 
-var libsrc = process.argv[2];
-var moduleId = process.argv[3];
-var liborigsrcdir = libsrc.substring(0, libsrc.lastIndexOf("/"));
-var srcfile = libsrc.substring(libsrc.lastIndexOf("/") + 1);
-var tmpdir = ".ngmakelibtmp";
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+let libsrc = process.argv[2];
+let moduleId = process.argv[3];
+let liborigsrcdir = libsrc.substring(0, libsrc.lastIndexOf("/"));
+let srcfile = libsrc.substring(libsrc.lastIndexOf("/") + 1);
+let tmpdir = ".ngmakelibtmp";
 fs.mkdirSync(tmpdir);
 shell.exec("cp -r " + liborigsrcdir + " " + tmpdir + "/src");
 inlineResourcesForDirectory(tmpdir);
-var config = new AngularCompilerConfig().getConfig("src/" + srcfile, "build", moduleId);
+let config = new AngularCompilerConfig().getConfig("src/" + srcfile, "build", moduleId);
 fs.writeFileSync(tmpdir + '/tsconfig.json', JSON.stringify(config));
 shell.exec("node_modules/.bin/ngc -p " + tmpdir + '/tsconfig.json');
-shell.exec("ls -l " + tmpdir);
-shell.exec("rm -Rf " + tmpdir);
+const inputOptions = {
+    input: tmpdir + "/build/" + moduleId + ".js"
+};
+const outputOptions = {
+    file: tmpdir + "/dist/" + moduleId + ".js",
+    format: 'es'
+};
+function build() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const bundle = yield rollup.rollup(inputOptions);
+        yield bundle.write(outputOptions);
+    });
+}
+
+build().then(() => {
+    console.log("All done");
+});
+//shell.exec("ls -Rl "+tmpdir);
+//shell.exec("rm -Rf "+tmpdir);

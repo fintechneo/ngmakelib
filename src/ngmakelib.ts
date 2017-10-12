@@ -2,6 +2,7 @@ import {inlineResourcesForDirectory} from './pkg-tools/inline-resources';
 import {AngularCompilerConfig} from './configs/angularcompiler.config';
 import {writeFileSync,mkdirSync} from 'fs';
 import * as shell from 'shelljs';
+import * as rollup from 'rollup';
 
 declare var process;
 
@@ -20,5 +21,22 @@ let config = new AngularCompilerConfig().getConfig(
     moduleId);
 writeFileSync(tmpdir+'/tsconfig.json',JSON.stringify(config));
 shell.exec("node_modules/.bin/ngc -p "+tmpdir+'/tsconfig.json');
-shell.exec("ls -l "+tmpdir);
-shell.exec("rm -Rf "+tmpdir);
+
+
+const inputOptions = {
+    input: tmpdir+"/build/"+moduleId+".js"    
+};
+const outputOptions = {
+    file: tmpdir+"/dist/"+moduleId+".js",
+    format: 'es'
+}
+async function build() {
+    const bundle = await rollup.rollup(inputOptions);            
+    await bundle.write(outputOptions);
+};
+build().then(() => {
+    console.log("All done");
+});
+
+//shell.exec("ls -Rl "+tmpdir);
+//shell.exec("rm -Rf "+tmpdir);

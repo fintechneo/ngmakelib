@@ -8,12 +8,12 @@
     "ngmakelib": "bin/ngmakelib.js"
   },
   "devDependencies": {
-    "@types/node": "^8.0.34",
-    "rollup": "^0.50.0",
+    "@types/node": "^8.0.34",    
     "rollup-plugin-shebang": "^0.1.4",
     "typescript": ""
   },
   "dependencies": {
+    "rollup": "^0.50.0",
     "shelljs": "^0.7.8",
     "@angular/compiler-cli": ""    
   }
