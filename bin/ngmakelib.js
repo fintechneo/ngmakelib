@@ -64,7 +64,7 @@ class AngularCompilerConfig {
                 "experimentalDecorators": true,
                 "declaration": true,
                 "lib": ["es2015", "dom"],
-                "noImplicitAny": true,
+                "noImplicitAny": false,
                 "suppressImplicitAnyIndexErrors": true
             },
             "files": [],
@@ -132,10 +132,19 @@ function build() {
 }
 
 build().then(() => {
-    shell.exec("./node_modules/.bin/cpx " + tmpdir + "/build/**/*.d.ts " + tmpdir + "/dist");
-    shell.exec("cp " + tmpdir + "/build/*.metadata.json " + tmpdir + "/dist/");
+  
+    let cmd='./node_modules/.bin/cpx "' + tmpdir + '/build/**/*.d.ts" "' + tmpdir + '/dist"'
+    console.log(cmd);
+    shell.exec(cmd);
+    cmd='cp '+ tmpdir + '/build/*.metadata.json ' + tmpdir + '/dist/'
+    console.log(cmd);
+    shell.exec(cmd)
     fs.writeFileSync(tmpdir + "/dist/package.json", JSON.stringify(new PackageJSONConfig().getConfig(moduleId), null, 1));
-    shell.exec("tar -C " + tmpdir + "/dist -zRcvf " + moduleId + ".tar.gz .");
+    
+    cmd="cd "+tmpdir + "/dist && tar -zcvf " + "../../" + moduleId + ".tar.gz ." 
+    console.log(cmd);
+    shell.exec(cmd);
+
     shell.exec("rm -Rf " + tmpdir);
     console.log("All done");
 });
