@@ -37,13 +37,14 @@ async function build() {
     await bundle.write(outputOptions);
 };
 build().then(() => {
-    shell.exec("./node_modules/.bin/cpx "+tmpdir+"/build/**/*.d.ts "+tmpdir+"/dist");
+    shell.exec('./node_modules/.bin/cpx "' + tmpdir + '/build/**/*.d.ts" "' + tmpdir + '/dist"');
     shell.exec("cp "+tmpdir+"/build/*.metadata.json "+tmpdir+"/dist/");
     writeFileSync(tmpdir+"/dist/package.json",
         JSON.stringify(new PackageJSONConfig().getConfig(moduleId)
             ,null,1));
-    shell.exec("tar -C "+tmpdir+"/dist -zRcvf "+moduleId+".tar.gz .");
+    shell.exec("cd "+tmpdir + "/dist && tar -zcvf " + "../../" + moduleId + ".tar.gz .");
     shell.exec("rm -Rf "+tmpdir);
     console.log("All done");
+
 });
 

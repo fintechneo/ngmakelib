@@ -10,7 +10,6 @@ export class AngularCompilerConfig {
             "experimentalDecorators": true,
             "declaration": true,
             "lib": ["es2015", "dom"],    
-            "noImplicitAny": true,
             "suppressImplicitAnyIndexErrors": true
             },
         
