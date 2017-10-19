@@ -1,4 +1,5 @@
 import shebang from 'rollup-plugin-shebang';
+import uglify from 'rollup-plugin-uglify';
 
 export default {
     input: 'build/ngmakelib.js',
@@ -8,6 +9,7 @@ export default {
     },    
     sourceMap: false,
     plugins: [
+      uglify(),
       shebang()
     ]
 }  

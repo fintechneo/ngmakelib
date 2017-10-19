@@ -14,6 +14,7 @@ let liborigsrcdir: string = libsrc.substring(0,libsrc.lastIndexOf("/"));
 let srcfile: string = libsrc.substring(libsrc.lastIndexOf("/")+1);
 
 let tmpdir = ".ngmakelibtmp";
+shell.exec("rm -Rf "+tmpdir);
 mkdirSync(tmpdir);
 shell.exec("cp -r "+liborigsrcdir+" "+tmpdir+"/src");
 inlineResourcesForDirectory(tmpdir);
