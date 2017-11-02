@@ -6,7 +6,7 @@ export class AngularCompilerConfig {
             "module": "es2015",
             "moduleResolution": "node",
             "sourceMap": true,
-            "emitDecoratorMetadata": false,
+            "emitDecoratorMetadata": true,
             "experimentalDecorators": true,
             "declaration": true,
             "lib": ["es2015", "dom"],    
@@ -18,6 +18,7 @@ export class AngularCompilerConfig {
             ],
     
         "angularCompilerOptions": {
+            "annotationsAs": "decorators",
             "genDir": "build",
             "flatModuleOutFile": null,
             "flatModuleId": null,
