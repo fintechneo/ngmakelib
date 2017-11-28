@@ -1,6 +1,8 @@
 import {dirname, join} from 'path';
-import {readFileSync, writeFileSync} from 'fs';
+import {readFileSync, writeFileSync } from 'fs';
+import {execSync } from 'child_process';
 import {sync as glob} from 'glob';
+import { renderSync } from 'node-sass';
 
 /** Finds all JavaScript files in a directory and inlines all resources of Angular components. */
 export function inlineResourcesForDirectory(folderPath: string) {
@@ -37,7 +39,18 @@ function inlineStyles(fileContent: string, filePath: string) {
 
     const styleContents = styleUrls
       .map(url => join(dirname(filePath), url))
-      .map(path => loadResourceFile(path));
+      .map(path => {        
+        if(path.endsWith(".scss")) {          
+          const rendered = renderSync({
+            file: path
+          });          
+          return rendered.css.toString()
+                    .replace(/([\n\r]\s*)+/gm, ' ')
+                    .replace(/"/g, '\\"');;          
+        }  else {
+          return loadResourceFile(path);
+        }               
+      });
 
     return `styles: ["${styleContents.join(' ')}"]`;
   });
