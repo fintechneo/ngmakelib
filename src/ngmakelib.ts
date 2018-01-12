@@ -23,7 +23,7 @@ let config = new AngularCompilerConfig().getConfig(
     "build",
     moduleId);
 writeFileSync(tmpdir+'/tsconfig.json',JSON.stringify(config));
-shell.exec("node_modules/.bin/ngc -p "+tmpdir+'/tsconfig.json');
+shell.exec('"node_modules/.bin/ngc" -p ' + tmpdir +'/tsconfig.json');
 
 
 const inputOptions = {
@@ -38,7 +38,7 @@ async function build() {
     await bundle.write(outputOptions);
 };
 build().then(() => {
-    shell.exec('./node_modules/.bin/cpx "' + tmpdir + '/build/**/*.d.ts" "' + tmpdir + '/dist"');
+    shell.exec('"node_modules/.bin/cpx" "' + tmpdir + '/build/**/*.d.ts" "' + tmpdir + '/dist"');
     shell.exec("cp "+tmpdir+"/build/*.metadata.json "+tmpdir+"/dist/");
     writeFileSync(tmpdir+"/dist/package.json",
         JSON.stringify(new PackageJSONConfig().getConfig(moduleId)
