@@ -10,6 +10,6 @@
         ]
     },
     "files": [
-        "src/ngmakelib.ts"
+        "src/ngmakelib.api.ts"
     ]
 }

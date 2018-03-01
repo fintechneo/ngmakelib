@@ -34,6 +34,8 @@ export class NGMakeLib {
             this.moduleId);
 
         this.packageJSONConfig = new PackageJSONConfig().getConfig(moduleId, version);
+        this.version = this.packageJSONConfig.version;
+
         this.rollupInputOptions = {
             input: this.tmpdir+"/build/"+this.moduleId+".js"    
         };

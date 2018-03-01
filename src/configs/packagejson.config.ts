@@ -2,8 +2,10 @@ import { readFileSync } from 'fs';
 
 export class PackageJSONConfig {
     public getConfig(moduleId: string, version?: string) : any {
+        console.log('version is ',version);
         if(!version) {
             try {
+                console.log('Trying to get version from package.json');
                 version = JSON.parse(readFileSync('package.json').toString()).version;
             } catch (e) {                
                 version = '0.1.0';
