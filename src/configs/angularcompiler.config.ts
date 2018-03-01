@@ -18,8 +18,7 @@ export class AngularCompilerConfig {
             ],
     
         "angularCompilerOptions": {
-            "annotationsAs": "decorators",
-            "genDir": "build",
+            "annotationsAs": "decorators",            
             "flatModuleOutFile": null,
             "flatModuleId": null,
             "skipTemplateCodegen": true,

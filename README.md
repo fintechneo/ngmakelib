@@ -38,8 +38,15 @@ ngMakeLib.ngcConfig.compilerOptions.allowSyntheticDefaultImports = true;
 // Create the library
 ngMakeLib.build().then(function() { console.log("All done"); });
 ```
+## Watch mode during development
 
-# Developing ngmakelib
+```
+./node_modules/.bin/ngmakelib --watch src/app/mymodule/mymodule.module.ts mymodule-library 0.1.1
+```
+
+And then you can link the `.ngmakelibtmp/build` folder to any project where you want to test consuming the library.
+
+## Developing ngmakelib
 
 The development environment is set up with mocha test suites that you can run by typing:
 

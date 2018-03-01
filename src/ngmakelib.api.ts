@@ -2,9 +2,13 @@ import { inlineResourcesForDirectory } from './pkg-tools/inline-resources';
 import { AngularCompilerConfig } from './configs/angularcompiler.config';
 import { PackageJSONConfig } from './configs/packagejson.config';
 
-import {writeFileSync,mkdirSync} from 'fs';
+import {writeFileSync, mkdirSync, copyFile} from 'fs';
+import { exec as asyncExec} from 'child_process';
 import { exec } from 'shelljs';
 import { rollup, Options, WriteOptions } from 'rollup';
+import { resolve as resolvePath } from 'path';
+
+import { watch, copy } from 'cpx';
 
 declare var process;
 
@@ -45,6 +49,38 @@ export class NGMakeLib {
         }   
     }
 
+    watch() {        
+        exec("rm -Rf "+this.tmpdir);
+        mkdirSync(this.tmpdir);
+        mkdirSync(this.tmpdir +'/build');
+
+        this.ngcConfig.angularCompilerOptions.generateCodeForLibraries = false;
+
+        writeFileSync(this.tmpdir+'/tsconfig.json',JSON.stringify(this.ngcConfig));
+        writeFileSync(this.tmpdir + '/build/package.json',
+                JSON.stringify(this.packageJSONConfig, null, 1
+            )
+        );
+
+        const watcher = watch(this.liborigsrcdir+'/**', this.tmpdir + '/src/');
+        watcher.on('watch-error', (err) => console.log(err));
+        
+        // watcher.on('remove', (evt) => console.log('remove', evt));
+        watcher.on('watch-ready', () => {
+            inlineResourcesForDirectory(this.tmpdir + '/src');
+            watcher.on('copy', (evt) => {
+                const path = evt.srcPath.substring(this.liborigsrcdir.length + 1);
+                const ext = ['.html', '.scss', '.css'].find(ext => path.indexOf(ext)>-1);
+                if( ext ) {
+                    inlineResourcesForDirectory(this.tmpdir + '/src');
+                }           
+            });
+            const ngcproc = asyncExec('"node_modules/.bin/ngc" -w -p ' + this.tmpdir +'/tsconfig.json');
+            ngcproc.stdout.pipe(process.stdout);
+            ngcproc.stderr.pipe(process.stderr);
+        });        
+    }
+
     build(): Promise<any> {        
         exec("rm -Rf "+this.tmpdir);
         mkdirSync(this.tmpdir);
@@ -70,7 +106,7 @@ export class NGMakeLib {
                         ".tar.gz ."
                     );
                     
-                exec("rm -Rf "+this.tmpdir);                            
+                // exec("rm -Rf "+this.tmpdir);                            
             });        
     }
 }
