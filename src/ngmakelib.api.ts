@@ -21,7 +21,7 @@ export class NGMakeLib {
     constructor(
             public libsrc: string, 
             public moduleId: string,
-            public version = '0.1.0'
+            public version?: string
         ) {
 
         this.liborigsrcdir = libsrc.substring(0,libsrc.lastIndexOf("/"));
