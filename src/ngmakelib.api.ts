@@ -1,4 +1,4 @@
-import { inlineResourcesForDirectory } from './pkg-tools/inline-resources';
+import { inlineResourcesForDirectory, inlineResourcesAsync } from './pkg-tools/inline-resources';
 import { AngularCompilerConfig } from './configs/angularcompiler.config';
 import { PackageJSONConfig } from './configs/packagejson.config';
 
@@ -70,10 +70,10 @@ export class NGMakeLib {
             inlineResourcesForDirectory(this.tmpdir + '/src');
             watcher.on('copy', (evt) => {
                 const path = evt.srcPath.substring(this.liborigsrcdir.length + 1);
-                const ext = ['.html', '.scss', '.css'].find(ext => path.indexOf(ext)>-1);
-                if( ext ) {
-                    inlineResourcesForDirectory(this.tmpdir + '/src');
-                }           
+                console.log(path);
+                if(path.indexOf('.ts')>0) {
+                    inlineResourcesAsync(this.tmpdir + '/src/' + path);
+                }
             });
             const ngcproc = asyncExec('"node_modules/.bin/ngc" -w -p ' + this.tmpdir +'/tsconfig.json');
             ngcproc.stdout.pipe(process.stdout);

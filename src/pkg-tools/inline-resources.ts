@@ -1,5 +1,5 @@
 import {dirname, join} from 'path';
-import {readFileSync, writeFileSync } from 'fs';
+import {readFileSync, writeFileSync, readFile, writeFile } from 'fs';
 import {execSync } from 'child_process';
 import {sync as glob} from 'glob';
 import { renderSync } from 'node-sass';
@@ -19,6 +19,19 @@ export function inlineResources(filePath: string) {
   fileContent = removeModuleId(fileContent);
 
   writeFileSync(filePath, fileContent, 'utf-8');
+}
+
+/** Inlines the external resources of Angular components of a file. */
+export function inlineResourcesAsync(filePath: string) {
+    readFile(filePath, 'utf-8', (err, fileContent) => {
+      fileContent = inlineTemplate(fileContent, filePath);
+      fileContent = inlineStyles(fileContent, filePath);
+      fileContent = removeModuleId(fileContent);
+
+      writeFile(filePath, fileContent, {encoding: 'utf-8'}, () =>
+        console.log("Inlined resources",filePath)
+      );
+    });
 }
 
 /** Inlines the templates of Angular components for a specified source file. */
