@@ -8,9 +8,7 @@ npm install ngmakelib
 To create the library run:
 
 ```
-"scripts": {
-  "lib": "./node_modules/.bin/ngmakelib src/app/mymodule/mymodule.module.ts mymodule-library 0.1.1"
-}
+./node_modules/.bin/ngmakelib src/app/mymodule/mymodule.module.ts mymodule-library 0.1.1
 ```
 
 And if all goes well you will have a file called ``mymodule-library-0.1.1.tar.gz``
