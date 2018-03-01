@@ -2,29 +2,23 @@
 NPM command line tool for generating Angular libraries
 
 ```
-npm install https://github.com/fintechneo/ngmakelib.git
-```
-
-Then create a script in the package.json file of your angular project:
-
-```
-"scripts": {
-  "lib": "ngmakelib src/app/mymodule/mymodule.module.ts mymodule-library"
-}
+npm install ngmakelib
 ```
 
 To create the library run:
 
 ```
-npm run lib
+"scripts": {
+  "lib": "./node_modules/.bin/ngmakelib src/app/mymodule/mymodule.module.ts mymodule-library 0.1.1"
+}
 ```
 
-And if all goes well you will have a file called ``mymodule-library.tar.gz``
+And if all goes well you will have a file called ``mymodule-library-0.1.1.tar.gz``
 
 Finally to install the library in another Angular project type:
 
 ```
-npm install path/to/mymodule-library.tar.gz
+npm install path/to/mymodule-library-0.1.1.tar.gz
 ```
 
 ## API to get more control of the build process
@@ -46,3 +40,13 @@ ngMakeLib.ngcConfig.compilerOptions.allowSyntheticDefaultImports = true;
 // Create the library
 ngMakeLib.build().then(function() { console.log("All done"); });
 ```
+
+# Developing ngmakelib
+
+The development environment is set up with mocha test suites that you can run by typing:
+
+`npm run test`
+
+You'll find the sources for these in the `test` folder.
+
+Also there's is the `examplelibrary_src` folder that is used in the test suites. This contains an example source for a library.

@@ -20,7 +20,8 @@ export class NGMakeLib {
 
     constructor(
             public libsrc: string, 
-            public moduleId: string
+            public moduleId: string,
+            public version = '0.1.0'
         ) {
 
         this.liborigsrcdir = libsrc.substring(0,libsrc.lastIndexOf("/"));
@@ -32,7 +33,7 @@ export class NGMakeLib {
             "build",
             this.moduleId);
 
-        this.packageJSONConfig = new PackageJSONConfig().getConfig(moduleId);
+        this.packageJSONConfig = new PackageJSONConfig().getConfig(moduleId, version);
         this.rollupInputOptions = {
             input: this.tmpdir+"/build/"+this.moduleId+".js"    
         };
@@ -61,7 +62,12 @@ export class NGMakeLib {
                     JSON.stringify(this.packageJSONConfig, null, 1
                     )
                 );
-                exec("cd "+this.tmpdir + "/dist && tar -zcvf " + "../../" + this.moduleId + ".tar.gz .");
+                exec("cd "+this.tmpdir + "/dist && tar -zcvf " + "../../" +
+                        this.moduleId + '-' +
+                        this.version +
+                        ".tar.gz ."
+                    );
+                    
                 exec("rm -Rf "+this.tmpdir);                            
             });        
     }
