@@ -1,8 +1,8 @@
 export class PackageJSONConfig {
-    public getConfig(moduleId: string) : any {
+    public getConfig(moduleId: string, version = '0.1.0') : any {
         return {
             "name": moduleId,
-            "version": "0.1.0",
+            "version": version,
             "main": moduleId+".js",
             "types": moduleId+".d.ts"
         };

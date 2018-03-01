@@ -1,7 +1,2 @@
-import { suite, test, slow, timeout } from 'mocha-typescript';
-
-@suite class Hello {
-    @test world() {
-        return true;
-    }
-}
+export { NGMakelibAPITest} from './ngmakelib.api.test';
+export { PackageJSONConfigTest} from './packagejson.config.test';

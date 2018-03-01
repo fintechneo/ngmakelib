@@ -3,13 +3,16 @@
   "version": "0.0.1",
   "scripts": {
     "build": "tsc && rollup -c rollup-conf-build.js && chmod a+x bin/ngmakelib.js",
-    "test": "mocha-typescript-watch -p test/tsconfig.json build/test.js"
+    "test": "mocha-typescript-watch -p test/tsconfig.json build/test/test.js"
   },
   "main": "bin/ngmakelib.api.js",
   "bin": {
     "ngmakelib": "bin/ngmakelib.js"
   },
   "devDependencies": {
+    "@angular/compiler": "",
+    "@angular/core": "",
+    "rxjs": "",
     "@types/node": "^8.0.34",
     "@types/rollup": "^0.51.4",
     "@types/shelljs": "^0.7.7",
