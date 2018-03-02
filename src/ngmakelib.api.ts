@@ -1,8 +1,9 @@
-import { inlineResourcesForDirectory, inlineResourcesAsync, inlineResource, getAffectedTypeScriptSourceFilesForResource } from './pkg-tools/inline-resources';
+import { inlineResourcesForDirectory, inlineResourcesAsync,
+    inlineResource, getAffectedTypeScriptSourceFilesForResource } from './pkg-tools/inline-resources';
 import { AngularCompilerConfig } from './configs/angularcompiler.config';
 import { PackageJSONConfig } from './configs/packagejson.config';
 
-import {writeFileSync, mkdirSync, copyFile} from 'fs';
+import {writeFileSync, mkdirSync, copyFile, existsSync} from 'fs';
 import { exec as asyncExec} from 'child_process';
 import { exec } from 'shelljs';
 import { rollup, Options, WriteOptions } from 'rollup';
@@ -50,9 +51,14 @@ export class NGMakeLib {
     }
 
     watch() {        
-        exec("rm -Rf "+this.tmpdir);
-        mkdirSync(this.tmpdir);
-        mkdirSync(this.tmpdir +'/build');
+        // exec("rm -Rf "+this.tmpdir);
+        if(!existsSync(this.tmpdir)) {
+            mkdirSync(this.tmpdir);
+        }
+        if(!existsSync(this.tmpdir +'/build')) {
+            mkdirSync(this.tmpdir +'/build');
+        }
+        
 
         this.ngcConfig.angularCompilerOptions.generateCodeForLibraries = false;
 
@@ -76,7 +82,7 @@ export class NGMakeLib {
                 } else if(['.css','.scss','.html'].find(ext => path.indexOf(ext)>-1)) {
                     getAffectedTypeScriptSourceFilesForResource(this.tmpdir + '/src/' + path)
                         .forEach(tsfile => {
-                            console.log(tsfile);
+                            // console.log(tsfile);
                             copyFile(
                                 this.liborigsrcdir + '/' + tsfile.substring((this.tmpdir + '/src/').length),
                                 tsfile,

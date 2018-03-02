@@ -36,7 +36,7 @@ export function inlineResourcesAsync(filePath: string): Observable<string> {
 
       writeFile(filePath, fileContent, {encoding: 'utf-8'}, () => {
         console.log('Inlined resources', filePath);
-        console.log(fileContent);
+        // console.log(fileContent);
         observer.next(fileContent);
       });
     })
