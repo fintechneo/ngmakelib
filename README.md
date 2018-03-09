@@ -16,7 +16,7 @@ And if all goes well you will have a file called ``mymodule-library-0.1.1.tar.gz
 Finally to install the library in another Angular project type:
 
 ```
-npm install path/to/mymodule-library-0.1.1.tar.gz
+npm install file:path/to/mymodule-library-0.1.1.tar.gz
 ```
 
 ## API to get more control of the build process
