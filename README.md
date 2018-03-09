@@ -46,6 +46,19 @@ ngMakeLib.build().then(function() { console.log("All done"); });
 
 And then you can link the `.ngmakelibtmp/build` folder to any project where you want to test consuming the library.
 
+### Note when linking from an @angular/cli host app
+
+In `angular-cli.json` under `defaults -> build` you should set the `preserveSymlinks` to true like this:
+
+```
+"defaults": {
+   "build": {
+      "preserveSymlinks": true
+    }
+}
+```
+this prevents the linked library from using it's own `node_modules` folder for resolving dependencies - which can cause unwanted effects when using linked mode.
+
 ## Developing ngmakelib
 
 The development environment is set up with mocha test suites that you can run by typing:
