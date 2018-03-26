@@ -59,6 +59,49 @@ In `angular-cli.json` under `defaults -> build` you should set the `preserveSyml
 ```
 this prevents the linked library from using it's own `node_modules` folder for resolving dependencies - which can cause unwanted effects when using linked mode.
 
+## Adding assets
+
+If you need to include assets like images, other js script files, webassembly binaries etc, ngmakelib supports adding these to the assets folder of the exported library.
+
+When consuming a library in assets in Angular CLI, you need to add the following to your `angular-cli.json`:
+
+```
+    "assets": [
+      "assets",
+      "favicon.ico",
+      { "glob": "**/*", "input": "../node_modules/my-library/assets/", "output": "./assets/" }        
+    ],
+```
+Replace `my-library` with the name of your library.
+
+For adding assets with ngmakelib you will use the `addAssets` method of the ngmakelib api.
+
+Here's an example script for building a library with assets (taken from the angular-git-filebrowser project https://github.com/fintechneo/angular-git-filebrowser):
+
+```
+var NGMakeLib = require('ngmakelib').NGMakeLib;
+
+// Initialize NGMakeLib with entry point source file and module name
+var ngMakeLib = new NGMakeLib('src/lib/filebrowser.module.ts', 'angular-filebrowser');
+
+// Add assets
+ngMakeLib.addAssets([
+        'stupid_worker.js',
+        'libgit2.js',
+        'libgit2.wasm'
+    ].map(a => 'src/assets/' +a)
+);
+
+
+if(process.argv[process.argv.length-1] === '--watch') {
+    // Create the library and watch for changes
+    ngMakeLib.watch();
+} else {
+    // Build package that can be published
+    ngMakeLib.build();
+}
+```
+
 ## Developing ngmakelib
 
 The development environment is set up with mocha test suites that you can run by typing:
