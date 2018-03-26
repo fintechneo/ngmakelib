@@ -3,8 +3,8 @@ import { inlineResourcesForDirectory, inlineResourcesAsync,
 import { AngularCompilerConfig } from './configs/angularcompiler.config';
 import { PackageJSONConfig } from './configs/packagejson.config';
 
-import {writeFileSync, mkdirSync, copyFile, existsSync} from 'fs';
-import { exec as asyncExec} from 'child_process';
+import {writeFileSync, mkdirSync, copyFile, existsSync, copyFileSync, rmdirSync, unlinkSync, readdirSync, statSync} from 'fs';
+import { spawn, ChildProcess} from 'child_process';
 import { exec } from 'shelljs';
 import { rollup, Options, WriteOptions } from 'rollup';
 import { resolve as resolvePath } from 'path';
@@ -23,6 +23,8 @@ export class NGMakeLib {
     liborigsrcdir: string;
     srcfile: string;
 
+    assets: string[] = [];
+    
     constructor(
             public libsrc: string, 
             public moduleId: string,
@@ -50,56 +52,103 @@ export class NGMakeLib {
         }   
     }
 
-    watch() {        
-        // exec("rm -Rf "+this.tmpdir);
+    createDirs(deleteFirst=false) {
+        if(deleteFirst) {
+            const recurseDelete = (folder) => {
+                readdirSync(folder).forEach(f => {
+                    const s = statSync(folder+ '/' +f);
+                    if(s.isDirectory()) {
+                        recurseDelete(folder+ '/' +f);
+                    } else if(s.isFile()) {
+                        unlinkSync(folder+ '/' +f);
+                    }                    
+                });
+                rmdirSync(folder);
+            };
+            recurseDelete(this.tmpdir);
+        }
+
         if(!existsSync(this.tmpdir)) {
             mkdirSync(this.tmpdir);
         }
-        if(!existsSync(this.tmpdir +'/build')) {
-            mkdirSync(this.tmpdir +'/build');
+        const builddir = this.tmpdir +'/build';
+        if(!existsSync(builddir)) {
+            mkdirSync(builddir);
         }
-        
 
-        this.ngcConfig.angularCompilerOptions.generateCodeForLibraries = false;
-
-        writeFileSync(this.tmpdir+'/tsconfig.json',JSON.stringify(this.ngcConfig));
-        writeFileSync(this.tmpdir + '/build/package.json',
-                JSON.stringify(this.packageJSONConfig, null, 1
-            )
-        );
-
-        const watcher = watch(this.liborigsrcdir+'/**', this.tmpdir + '/src/');
-        watcher.on('watch-error', (err) => console.log(err));
-        
-        // watcher.on('remove', (evt) => console.log('remove', evt));
-        watcher.on('watch-ready', () => {
-            inlineResourcesForDirectory(this.tmpdir + '/src');
-            watcher.on('copy', (evt) => {
-                const path = evt.srcPath.substring(this.liborigsrcdir.length + 1);
-                
-                if(path.indexOf('.ts')>0) {
-                    inlineResourcesAsync(this.tmpdir + '/src/' + path).subscribe();
-                } else if(['.css','.scss','.html'].find(ext => path.indexOf(ext)>-1)) {
-                    getAffectedTypeScriptSourceFilesForResource(this.tmpdir + '/src/' + path)
-                        .forEach(tsfile => {
-                            // console.log(tsfile);
-                            copyFile(
-                                this.liborigsrcdir + '/' + tsfile.substring((this.tmpdir + '/src/').length),
-                                tsfile,
-                                () => inlineResourcesAsync(tsfile).subscribe()
-                            );
-                        });
-                }
-            });
-            const ngcproc = asyncExec('"node_modules/.bin/ngc" -w -p ' + this.tmpdir +'/tsconfig.json');
-            ngcproc.stdout.pipe(process.stdout);
-            ngcproc.stderr.pipe(process.stderr);
-        });        
     }
 
-    build(): Promise<any> {        
-        exec("rm -Rf "+this.tmpdir);
-        mkdirSync(this.tmpdir);
+    addAssets(paths: string[]) {
+        paths.forEach(p => this.assets.push(p));
+    }
+
+    copyAssets() {
+        const assetsdir = `${this.tmpdir}/build/assets`;
+
+        if(!existsSync(assetsdir)) {
+            mkdirSync(assetsdir);
+        }
+
+        this.assets.forEach((path) => {
+            const filename = path.split(/\//).pop();
+            copyFileSync(path, `${assetsdir}/${filename}`);
+        });
+    }
+
+    watch(): Promise<ChildProcess> {  
+        this.createDirs();
+        this.copyAssets();
+
+        return new Promise((resolve, reject) => {
+            this.ngcConfig.angularCompilerOptions.generateCodeForLibraries = false;
+
+            writeFileSync(this.tmpdir+'/tsconfig.json',JSON.stringify(this.ngcConfig));
+            writeFileSync(this.tmpdir + '/build/package.json',
+                    JSON.stringify(this.packageJSONConfig, null, 1
+                )
+            );
+
+            const watcher = watch(this.liborigsrcdir+'/**', this.tmpdir + '/src/');
+            watcher.on('watch-error', (err) => console.log(err));
+            
+            // watcher.on('remove', (evt) => console.log('remove', evt));
+            watcher.on('watch-ready', () => {
+                inlineResourcesForDirectory(this.tmpdir + '/src');
+                watcher.on('copy', (evt) => {
+                    const path = evt.srcPath.substring(this.liborigsrcdir.length + 1);
+                    
+                    if(path.indexOf('.ts')>0) {
+                        inlineResourcesAsync(this.tmpdir + '/src/' + path).subscribe();
+                    } else if(['.css','.scss','.html'].find(ext => path.indexOf(ext)>-1)) {
+                        getAffectedTypeScriptSourceFilesForResource(this.tmpdir + '/src/' + path)
+                            .forEach(tsfile => {
+                                // console.log(tsfile);
+                                copyFile(
+                                    this.liborigsrcdir + '/' + tsfile.substring((this.tmpdir + '/src/').length),
+                                    tsfile,
+                                    () => inlineResourcesAsync(tsfile).subscribe()
+                                );
+                            });
+                    }
+                });
+                const ngcproc = spawn(
+                    'node_modules/.bin/ngc',
+                    [
+                        '-w',
+                        '-p',
+                        this.tmpdir+'/tsconfig.json'
+                    ]);
+                ngcproc.stdout.pipe(process.stdout);
+                ngcproc.stderr.pipe(process.stderr);
+                resolve(ngcproc);
+            });
+        });
+    }
+
+    build(): Promise<any> {  
+        this.createDirs(true);
+        this.copyAssets();
+              
         exec("cp -r "+this.liborigsrcdir+" "+this.tmpdir+"/src");
         inlineResourcesForDirectory(this.tmpdir);
         
@@ -110,6 +159,7 @@ export class NGMakeLib {
             .then((bundle) =>  bundle.write(this.rollupOutputOptions))
             .then(() => {
                 exec('"node_modules/.bin/cpx" "' + this.tmpdir + '/build/**/*.d.ts" "' + this.tmpdir + '/dist"');
+                exec('"node_modules/.bin/cpx" "' + this.tmpdir + '/build/assets/**/*" "' + this.tmpdir + '/dist/assets"');
                 exec("cp "+ this.tmpdir +"/build/*.metadata.json "+
                     this.tmpdir+"/dist/");
                 writeFileSync(this.tmpdir + "/dist/package.json",

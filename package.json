@@ -1,6 +1,6 @@
 {
   "name": "ngmakelib",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "homepage": "https://github.com/fintechneo/ngmakelib",
   "scripts": {
     "build": "tsc && rollup -c rollup-conf-build.js && chmod a+x bin/ngmakelib.js",
