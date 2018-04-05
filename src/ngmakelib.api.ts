@@ -132,7 +132,8 @@ export class NGMakeLib {
                     }
                 });
                 const ngcproc = spawn(
-                    'node_modules/.bin/ngc',
+                        /^win/.test(process.platform) ? 
+                        'node_modules\\.bin\\ngc.cmd' : 'node_modules/.bin/ngc',
                     [
                         '-w',
                         '-p',
