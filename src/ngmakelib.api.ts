@@ -53,7 +53,7 @@ export class NGMakeLib {
     }
 
     createDirs(deleteFirst=false) {
-        if(deleteFirst) {
+        if(deleteFirst && existsSync(this.tmpdir)) {
             const recurseDelete = (folder) => {
                 readdirSync(folder).forEach(f => {
                     const s = statSync(folder+ '/' +f);
