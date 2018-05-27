@@ -163,6 +163,7 @@ export class NGMakeLib {
                 exec('"node_modules/.bin/cpx" "' + this.tmpdir + '/build/assets/**/*" "' + this.tmpdir + '/dist/assets"');
                 exec("cp "+ this.tmpdir +"/build/*.metadata.json "+
                     this.tmpdir+"/dist/");
+                exec(`cp README* ${this.tmpdir}/dist/`)
                 writeFileSync(this.tmpdir + "/dist/package.json",
                     JSON.stringify(this.packageJSONConfig, null, 1
                     )
