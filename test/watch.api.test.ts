@@ -14,7 +14,8 @@ import { execSync, ChildProcess } from 'child_process';
         const version = '0.2.0';
         const ngmakelib = new NGMakeLib(libsrc, moduleId, version);
         ngmakelib.addAssets(['examplelibrary_src/someasset.txt']);
-        ok(existsSync(ngmakelib.tmpdir + '/build/assets/someasset.txt'));
+        console.log("Check that someasset.txt is not present before build");
+        ok(!existsSync(ngmakelib.tmpdir + '/build/assets/someasset.txt'));
 
         ngmakelib.watch().then((watchprocess: ChildProcess) => {
             

@@ -1,6 +1,6 @@
 {
   "name": "ngmakelib",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Command line tool for building Angular libraries",
   "homepage": "https://github.com/fintechneo/ngmakelib",
   "bugs": {

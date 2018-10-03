@@ -39,4 +39,23 @@ import { execSync, ChildProcess } from 'child_process';
             done();
         });
     }
+
+    @test(timeout(20000)) createlibcustomreadme(done) {        
+        const libsrc = 'examplelibrary_src/examplelib.module.ts';
+        const moduleId = 'ngmakelibexample';
+        const version = '0.2.0';
+        const ngmakelib = new NGMakeLib(libsrc, moduleId, version);
+        ngmakelib.setREADME('examplelibrary_src/README_library.md');
+        ngmakelib.build().then(() => {
+            const filename = moduleId + '-' + version + '.tar.gz';
+            equal(existsSync(filename), true);
+            ok(execSync(`tar -xOzf ${filename} "./README.md"`)
+                .toString()
+                .split(/\n/)
+                .map(line => { console.log(line); return line;})
+                .findIndex(line => line.indexOf('# THE LIBRARY') > -1) !== -1);
+            unlinkSync(filename);
+            done();
+        });
+    }
 }
