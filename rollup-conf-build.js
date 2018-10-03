@@ -1,4 +1,4 @@
-import uglify from 'rollup-plugin-uglify';
+import { uglify } from 'rollup-plugin-uglify';
 
 export default {
     input: 'build/ngmakelib.api.js',

@@ -1,5 +1,5 @@
 import { inlineResourcesForDirectory, inlineResourcesAsync,
-    inlineResource, getAffectedTypeScriptSourceFilesForResource } from './pkg-tools/inline-resources';
+    getAffectedTypeScriptSourceFilesForResource } from './pkg-tools/inline-resources';
 import { AngularCompilerConfig } from './configs/angularcompiler.config';
 import { PackageJSONConfig } from './configs/packagejson.config';
 
@@ -7,9 +7,8 @@ import {writeFileSync, mkdirSync, copyFile, existsSync, copyFileSync, rmdirSync,
 import { spawn, ChildProcess} from 'child_process';
 import { exec } from 'shelljs';
 import { rollup, Options, WriteOptions } from 'rollup';
-import { resolve as resolvePath } from 'path';
 
-import { watch, copy } from 'cpx';
+import { watch } from 'cpx';
 
 declare var process;
 
@@ -24,7 +23,8 @@ export class NGMakeLib {
     srcfile: string;
 
     assets: string[] = [];
-    
+    readmepath: string;
+
     constructor(
             public libsrc: string, 
             public moduleId: string,
@@ -80,6 +80,14 @@ export class NGMakeLib {
 
     addAssets(paths: string[]) {
         paths.forEach(p => this.assets.push(p));
+    }
+
+    /**
+     * If not the default README.md, you can specify the path of the readme file you want to use for the library here
+     * @param readmepath 
+     */
+    setREADME(readmepath: string) {
+        this.readmepath = readmepath;
     }
 
     copyAssets() {
@@ -163,7 +171,11 @@ export class NGMakeLib {
                 exec('"node_modules/.bin/cpx" "' + this.tmpdir + '/build/assets/**/*" "' + this.tmpdir + '/dist/assets"');
                 exec("cp "+ this.tmpdir +"/build/*.metadata.json "+
                     this.tmpdir+"/dist/");
-                exec(`cp README* ${this.tmpdir}/dist/`)
+                if(!this.readmepath) {
+                    exec(`cp README* ${this.tmpdir}/dist/`)
+                } else {
+                    exec(`cp ${this.readmepath} ${this.tmpdir}/dist/README.md`)
+                }
                 writeFileSync(this.tmpdir + "/dist/package.json",
                     JSON.stringify(this.packageJSONConfig, null, 1
                     )

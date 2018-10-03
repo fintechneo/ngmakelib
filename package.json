@@ -21,11 +21,11 @@
     "@types/node": "^8.0.34",
     "@types/rollup": "^0.51.4",
     "@types/shelljs": "^0.7.7",
-    "mocha": "^4.1.0",
-    "mocha-typescript": "^1.1.12",
-    "rollup-plugin-shebang": "^0.1.4",
+    "mocha": "",
+    "mocha-typescript": "",
+    "rollup-plugin-shebang": "",
     "rollup-plugin-uglify": "",
-    "typescript": ""
+    "typescript": "~2.7.2"
   },
   "dependencies": {
     "cpx": "",

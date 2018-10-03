@@ -1,10 +1,9 @@
 import {dirname, join} from 'path';
 import {readFileSync, writeFileSync, readFile, writeFile } from 'fs';
-import {execSync } from 'child_process';
 import {sync as glob} from 'glob';
 import { renderSync } from 'node-sass';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
+import { Observable } from 'rxjs';
+import { of } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 
 export const resourceSourceFileRefs: {[tsfile: string] : {[resourcefile: string]: boolean }} = {};
